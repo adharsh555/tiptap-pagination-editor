@@ -12,6 +12,11 @@ A professional, Tiptap-based document editor with real-time pagination, specific
 - **Integrated Header Toolbar**: Professional branding with document naming and high-visibility utility tools (New/Clear/Export).
 - **Print Perfection**: CSS-paged media logic ensures that the "Print to PDF" output matches the editor's visual page breaks.
 
+## Live Demo & Repository
+
+- **Live Demo**: [View Live Editor](https://tiptap-pagination-editor.vercel.app) *(Replace with your final Vercel URL)*
+- **GitHub Repository**: [adharsh555/tiptap-pagination-editor](https://github.com/adharsh555/tiptap-pagination-editor)
+
 ## Getting Started
 
 ### Prerequisites
@@ -23,7 +28,7 @@ A professional, Tiptap-based document editor with real-time pagination, specific
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/adharsh555/tiptap-pagination-editor.git
    cd tiptap-pagination-editor
    ```
 
