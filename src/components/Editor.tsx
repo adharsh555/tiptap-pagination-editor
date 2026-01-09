@@ -65,178 +65,176 @@ const Toolbar = ({
     if (!editor) return null;
 
     return (
-        <div className="w-full bg-[#1a2a40] text-white border-b border-gray-800 select-none print:hidden">
-            <div className="max-w-screen-xl mx-auto px-6 h-12 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-1.5 rounded-md">
-                        <FileText size={18} className="text-white" />
-                    </div>
-                    <input
-                        type="text"
-                        defaultValue="Untitled Legal Document"
-                        className="bg-transparent border-none focus:outline-none text-sm font-semibold tracking-wide w-64 hover:bg-white/10 px-2 py-1 rounded transition text-white"
-                    />
+        <div className="w-full bg-[#f9fbfd] select-none print:hidden flex flex-col">
+            {/* Top Header Layer: Title & Menus */}
+            <div className="flex items-center px-4 pt-2 pb-1 gap-4">
+                <div className="bg-blue-600 p-1.5 rounded-md cursor-pointer hover:bg-blue-700 transition" onClick={onNew}>
+                    <FileText size={20} className="text-white" />
                 </div>
-                <div className="flex items-center gap-4">
-                    {/* Template Selection */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setShowTemplates(!showTemplates)}
-                            className="flex items-center gap-2 px-3 py-1 bg-white/10 hover:bg-white/20 rounded border border-white/20 text-xs font-bold transition-all active:scale-95"
-                            title="Legal Templates"
-                        >
-                            <div className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center text-[10px]">i</div>
-                            Templates
-                            <ChevronDown size={12} className={`transition-transform ${showTemplates ? 'rotate-180' : ''}`} />
-                        </button>
+                <div className="flex flex-col flex-grow">
+                    <div className="flex items-center gap-2 group">
+                        <input
+                            type="text"
+                            defaultValue="Untitled Legal Document"
+                            className="bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-[#1f1f1f] px-1 rounded -ml-1 w-fit min-w-[100px] hover:border hover:border-gray-300 transition-all font-medium"
+                        />
+                        <div className="text-[11px] text-gray-400 font-medium lowercase flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Save size={10} /> {saveStatus}
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 -ml-1 mt-0.5">
+                        {["File", "Edit", "View", "Insert", "Format", "Tools", "Extensions", "Help"].map((menu) => (
+                            <div key={menu} className="menu-item">{menu}</div>
+                        ))}
+                    </div>
+                </div>
 
-                        {showTemplates && (
-                            <>
-                                <div className="fixed inset-0 z-30" onClick={() => setShowTemplates(false)} />
-                                <div className="absolute top-10 right-0 w-72 bg-white rounded-lg shadow-2xl border border-gray-200 text-gray-800 z-40 overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 mb-1">
-                                        Select Legal Structure
-                                    </div>
-                                    {LEGAL_TEMPLATES.map((tpl) => (
-                                        <button
-                                            key={tpl.id}
-                                            onClick={() => {
-                                                onSelectTemplate(tpl.content);
-                                                setShowTemplates(false);
-                                            }}
-                                            className="w-full text-left px-4 py-3 hover:bg-gray-50 flex flex-col gap-0.5 transition-colors group"
-                                        >
-                                            <span className="text-sm font-bold text-gray-700 group-hover:text-blue-600">{tpl.name}</span>
-                                            <span className="text-[10px] text-gray-400 leading-tight">{tpl.description}</span>
-                                        </button>
-                                    ))}
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setShowTemplates(!showTemplates)}
+                        className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded border border-gray-200 text-xs font-semibold text-[#444746] transition-all bg-white shadow-sm"
+                        title="Drafting Templates"
+                    >
+                        <div className="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">i</div>
+                        Templates
+                        <ChevronDown size={14} className={`transition-transform text-gray-500 ${showTemplates ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {showTemplates && (
+                        <>
+                            <div className="fixed inset-0 z-30" onClick={() => setShowTemplates(false)} />
+                            <div className="absolute top-14 right-24 w-72 bg-white rounded-xl shadow-[0_10px_38px_rgba(0,0,0,0.15)] border border-gray-200 text-gray-800 z-40 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-150">
+                                <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">
+                                    Quick Structures
                                 </div>
-                            </>
-                        )}
-                    </div>
-
-                    <div className="w-px h-6 bg-white/10 mx-1" />
-
-                    <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full border border-white/10">
-                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Auto-Save</span>
-                        <button
-                            onClick={() => setIsAutoSave(!isAutoSave)}
-                            className={`w-8 h-4 rounded-full relative transition-colors ${isAutoSave ? 'bg-blue-500' : 'bg-gray-600'}`}
-                        >
-                            <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${isAutoSave ? 'left-4.5' : 'left-0.5'}`} />
-                        </button>
-                    </div>
-
-                    {!isAutoSave && (
-                        <button
-                            onClick={handleManualSaveClick}
-                            className="flex items-center gap-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-bold transition-all active:scale-95"
-                        >
-                            <Save size={14} /> Save Now
-                        </button>
+                                {LEGAL_TEMPLATES.map((tpl) => (
+                                    <button
+                                        key={tpl.id}
+                                        onClick={() => {
+                                            if (confirm("Load template?")) onSelectTemplate(tpl.content);
+                                            setShowTemplates(false);
+                                        }}
+                                        className="w-full text-left px-4 py-3 hover:bg-[#f8f9fa] flex flex-col gap-0.5 transition-colors group"
+                                    >
+                                        <span className="text-sm font-semibold text-[#1f1f1f] group-hover:text-blue-600">{tpl.name}</span>
+                                        <span className="text-[10px] text-gray-500 leading-tight">{tpl.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </>
                     )}
 
-                    <div className="text-[10px] font-bold uppercase tracking-widest opacity-60 flex items-center gap-2 min-w-[60px]">
-                        <Save size={12} /> {saveStatus}
+                    <div className="flex items-center gap-1.5 px-4 py-2 bg-[#c2e7ff] hover:bg-[#b3d9f2] text-[#001d35] rounded-full text-sm font-semibold transition-all cursor-pointer shadow-sm">
+                        Share
                     </div>
-                    <div className="h-4 w-px bg-gray-600" />
-                    <button
-                        onClick={onNew}
-                        title="New Document"
-                        className="p-2 hover:bg-white/10 rounded-full transition"
-                    >
-                        <Plus size={18} />
-                    </button>
-                    <button
-                        onClick={onDelete}
-                        title="Clear Document"
-                        className="p-2 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-full transition"
-                    >
-                        <Trash2 size={18} />
-                    </button>
+                    <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                        A
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-white text-gray-700 border-b border-gray-200 shadow-sm relative z-20">
-                <div className="max-w-screen-xl mx-auto px-6 h-14 flex items-center gap-1">
-                    <div className="flex items-center gap-0.5 mr-2">
-                        <button
-                            onClick={() => editor.chain().focus().toggleBold().run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('bold') ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Bold"
-                        >
-                            <Bold size={18} />
-                        </button>
-                        <button
-                            onClick={() => editor.chain().focus().toggleItalic().run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('italic') ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Italic"
-                        >
-                            <Italic size={18} />
-                        </button>
-                        <button
-                            onClick={() => editor.chain().focus().toggleUnderline().run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('underline') ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Underline"
-                        >
-                            <UnderlineIcon size={18} />
-                        </button>
-                    </div>
+            {/* Bottom Toolbar Layer: Formatting */}
+            <div className="mx-4 my-1 flex items-center gap-1 bg-[#edf2fa] rounded-full px-4 h-10 shadow-sm border border-transparent hover:border-gray-200 transition-all">
+                <button
+                    onClick={onNew}
+                    title="New Document"
+                    className="toolbar-btn"
+                >
+                    <Plus size={18} />
+                </button>
+                <button
+                    onClick={onDelete}
+                    title="Clear Document"
+                    className="toolbar-btn hover:text-red-600"
+                >
+                    <Trash2 size={18} />
+                </button>
 
-                    <div className="w-px h-8 bg-gray-200 mx-2" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
-                    <div className="flex items-center gap-0.5 mx-2">
-                        <button
-                            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Heading 1"
-                        >
-                            <Heading1 size={18} />
-                        </button>
-                        <button
-                            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Heading 2"
-                        >
-                            <Heading2 size={18} />
-                        </button>
-                        <button
-                            onClick={() => editor.chain().focus().setParagraph().run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('paragraph') ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Paragraph"
-                        >
-                            <Type size={18} />
-                        </button>
-                    </div>
+                <button
+                    onClick={() => editor.chain().focus().toggleBold().run()}
+                    className={`toolbar-btn ${editor.isActive('bold') ? 'active' : ''}`}
+                    title="Bold"
+                >
+                    <Bold size={18} />
+                </button>
+                <button
+                    onClick={() => editor.chain().focus().toggleItalic().run()}
+                    className={`toolbar-btn ${editor.isActive('italic') ? 'active' : ''}`}
+                    title="Italic"
+                >
+                    <Italic size={18} />
+                </button>
+                <button
+                    onClick={() => editor.chain().focus().toggleUnderline().run()}
+                    className={`toolbar-btn ${editor.isActive('underline') ? 'active' : ''}`}
+                    title="Underline"
+                >
+                    <UnderlineIcon size={18} />
+                </button>
 
-                    <div className="w-px h-8 bg-gray-200 mx-2" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
-                    <div className="flex items-center gap-0.5 mx-2">
-                        <button
-                            onClick={() => editor.chain().focus().toggleBulletList().run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('bulletList') ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Bullet Points"
-                        >
-                            <List size={18} />
-                        </button>
-                        <button
-                            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                            className={`p-2 rounded hover:bg-gray-100 transition ${editor.isActive('orderedList') ? 'bg-gray-200 text-black' : 'text-gray-600'}`}
-                            title="Numbered List"
-                        >
-                            <ListOrdered size={18} />
-                        </button>
-                    </div>
+                <button
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                    className={`toolbar-btn ${editor.isActive('heading', { level: 1 }) ? 'active' : ''}`}
+                    title="Heading 1"
+                >
+                    <Heading1 size={18} />
+                </button>
+                <button
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                    className={`toolbar-btn ${editor.isActive('heading', { level: 2 }) ? 'active' : ''}`}
+                    title="Heading 2"
+                >
+                    <Heading2 size={18} />
+                </button>
 
-                    <div className="flex-grow" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
+                <button
+                    onClick={() => editor.chain().focus().toggleBulletList().run()}
+                    className={`toolbar-btn ${editor.isActive('bulletList') ? 'active' : ''}`}
+                    title="Bullet Points"
+                >
+                    <List size={18} />
+                </button>
+                <button
+                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                    className={`toolbar-btn ${editor.isActive('orderedList') ? 'active' : ''}`}
+                    title="Numbered List"
+                >
+                    <ListOrdered size={18} />
+                </button>
+
+                <div className="flex-grow" />
+
+                <div className="flex items-center gap-2 mr-2">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Auto-Save</span>
                     <button
-                        onClick={() => window.print()}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#1a2a40] text-white rounded font-semibold text-sm hover:bg-black transition-all"
+                        onClick={() => setIsAutoSave(!isAutoSave)}
+                        className={`w-7 h-3.5 rounded-full relative transition-colors ${isAutoSave ? 'bg-blue-500' : 'bg-gray-400'}`}
                     >
-                        <Printer size={16} /> Export PDF
+                        <div className={`absolute top-0.5 w-2.5 h-2.5 bg-white rounded-full transition-all ${isAutoSave ? 'left-4' : 'left-0.5'}`} />
                     </button>
                 </div>
+
+                {!isAutoSave && (
+                    <button
+                        onClick={handleManualSaveClick}
+                        className="toolbar-btn text-blue-600 font-bold text-xs"
+                    >
+                        <Save size={14} className="mr-1" /> SAVE
+                    </button>
+                )}
+
+                <button
+                    onClick={() => window.print()}
+                    className="flex items-center gap-1.5 px-3 py-1 hover:bg-gray-200 rounded transition text-[#444746] font-semibold text-xs"
+                >
+                    <Printer size={16} /> Print
+                </button>
             </div>
         </div>
     );
