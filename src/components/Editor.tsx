@@ -82,11 +82,6 @@ const Toolbar = ({
                             <Save size={10} /> {saveStatus}
                         </div>
                     </div>
-                    <div className="flex items-center gap-1 -ml-1 mt-0.5">
-                        {["File", "Edit", "View", "Insert", "Format", "Tools", "Extensions", "Help"].map((menu) => (
-                            <div key={menu} className="menu-item">{menu}</div>
-                        ))}
-                    </div>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -103,7 +98,7 @@ const Toolbar = ({
                     {showTemplates && (
                         <>
                             <div className="fixed inset-0 z-30" onClick={() => setShowTemplates(false)} />
-                            <div className="absolute top-14 right-24 w-72 bg-white rounded-xl shadow-[0_10px_38px_rgba(0,0,0,0.15)] border border-gray-200 text-gray-800 z-40 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-150">
+                            <div className="absolute top-14 right-4 w-72 bg-white rounded-xl shadow-[0_10px_38px_rgba(0,0,0,0.15)] border border-gray-200 text-gray-800 z-40 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-150">
                                 <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">
                                     Quick Structures
                                 </div>
@@ -123,13 +118,6 @@ const Toolbar = ({
                             </div>
                         </>
                     )}
-
-                    <div className="flex items-center gap-1.5 px-4 py-2 bg-[#c2e7ff] hover:bg-[#b3d9f2] text-[#001d35] rounded-full text-sm font-semibold transition-all cursor-pointer shadow-sm">
-                        Share
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
-                        A
-                    </div>
                 </div>
             </div>
 
