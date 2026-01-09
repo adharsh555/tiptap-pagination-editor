@@ -75,7 +75,7 @@ const Toolbar = ({
                     <div className="flex items-center gap-2 group">
                         <input
                             type="text"
-                            defaultValue="Untitled Legal Document"
+                            defaultValue="LegalDraft Pro - Untitled"
                             className="bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-[#1f1f1f] px-1 rounded -ml-1 w-fit min-w-[100px] hover:border hover:border-gray-300 transition-all font-medium"
                         />
                         <div className="text-[11px] text-gray-400 font-medium lowercase flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -1,64 +1,61 @@
-# Tiptap Pagination Editor (Legal Edition)
+# LegalDraft Pro: Tiptap Pagination Editor
+*Submission for OpenSphere Full-Stack Intern Assignment*
 
-A professional, Tiptap-based document editor with real-time pagination, specifically designed for legal professionals (e.g., immigration cover letters and petitions).
-
-## Features
-
-- **Real-time Pagination**: Content automatically flows across pages as you type, with visual US Letter (8.5" x 11") boundaries.
-- **Formal Legal Aesthetic**: Serif typography (Playfair Display), justified text, and a high-contrast integrated header.
-- **Template Selection System**: An info-icon dropdown providing instant structures for I-140 Cover Letters, Support Letters, and more.
-- **Optional Auto-Save**: Toggle between automatic saving and manual control for intentional document persistence.
-- **US Letter Proportions**: 1-inch margins and standard 12pt equivalent font size.
-- **Integrated Header Toolbar**: Professional branding with document naming and high-visibility utility tools (New/Clear/Export).
-- **Print Perfection**: CSS-paged media logic ensures that the "Print to PDF" output matches the editor's visual page breaks.
+## Overview
+LegalDraft Pro is a specialized Tiptap-based editor designed for the immigration law workflow. It solves the "content measurement" challenge by implementing real-time pagination with exact US Letter (8.5" x 11") parity, ensuring that what the user drafts is exactly what will be printed for USCIS submissions.
 
 ## Live Demo & Repository
-
-- **Live Demo**: [View Live Editor](https://tiptap-pagination-editor-alpha.vercel.app/)
+- **Live Demo**: [https://tiptap-pagination-editor-alpha.vercel.app/](https://tiptap-pagination-editor-alpha.vercel.app/)
 - **GitHub Repository**: [adharsh555/tiptap-pagination-editor](https://github.com/adharsh555/tiptap-pagination-editor)
+
+---
+
+## Technical Approach: How Pagination Works
+
+### 1. The Measurement Engine
+Pagination in rich text is difficult because DOM nodes don't have a fixed "page" concept. My approach uses a custom **Tiptap Extension** that taps into the `view.update` hook:
+- **Node-Level Measurement**: The extension iterates through the editor's rendered DOM content.
+- **DPI-Aware Calculation**: It calculates the cumulative height of block nodes (paragraphs, headings, lists) against a baseline of **1056px** (11 inches at 96 DPI).
+- **Slack-Based Decorations**: When the content exceeds the Drawable Height (9 inches of content + 2 inches of margins), it calculates the "slack" (empty space left on the page).
+
+### 2. High-Fidelity Page Breaks
+Unlike simple dividers, LegalDraft Pro uses a **Widget Decoration** strategy:
+- It inserts a dynamic-height decoration that accounts for: **[Slack] + [Bottom Margin] + [Workspace Gap] + [Top Margin]**.
+- This ensures that the distance from the top of Page 1 to the top of Page 2 is **exactly 1088px** (11 inches + 32px workspace gap), matching the vertical rhythm of Google Docs.
+
+### 3. Print Parity
+I used **CSS Paged Media** rules (`@media print`) and strict `box-sizing: border-box` styling to ensure that the 1-inch margins in the editor translate perfectly to the binary PDF output.
+
+---
+
+## Trade-offs and Limitations
+
+- **Block-Level Splitting**: Currently, page breaks occur *between* Tiptap nodes. If a single paragraph is longer than 11 inches, it will not be split mid-paragraph in this version. 
+- **Performance**: Recalculating heights on every change is efficient for 5-10 page documents, but for a 100-page petition, this would transition to an Intersection Observer or "Windowing" approach to maintain 60fps.
+- **DPI Reliance**: The 96dpi assumption is standard for most browsers but can vary with OS-level scaling. Future iterations would use a hidden "ruler" element to calibrate DPI dynamically.
+
+---
+
+## Improvements with More Time
+1. **Paragraph/Row Splitting**: Implementing a logic to split multi-line paragraphs across pages using `line-height` math.
+2. **Table Pagination**: Handling page breaks inside table rows (repeating headers).
+3. **Dynamic Headers/Footers**: Allowing users to double-click the top/bottom margins to edit recurring document headers.
+4. **Offline Persistence**: Using IndexDB/Supabase for robust local-first drafting.
+
+---
 
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js (v18+)
 - npm
 
 ### Installation
-
 1. Clone the repository:
    ```bash
    git clone https://github.com/adharsh555/tiptap-pagination-editor.git
    cd tiptap-pagination-editor
    ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Technical Approach
-
-### 1. Dynamic Page Calculations
-The core pagination logic is implemented as a custom Tiptap extension. It uses the `view.update` hook to monitor changes in the document. 
-- It iterates through the rendered DOM children of the editor.
-- Measures the height of each block-level element (paragraphs, headings, lists).
-- When the cumulative height exceeds the target page height (calculated based on US Letter 11" at screen DPI), it inserts a **Widget Decoration** at that position.
-- This decoration visually separates the content without breaking the underlying ProseMirror document structure.
-
-### 2. Trade-offs and Limitations
-- **Paragraph Splitting**: Currently, page breaks occur *between* block-level nodes. If a single paragraph is extremely long (longer than a page), it won't be split mid-paragraph in this prototype. Solving this would require more complex line-height measurement or `nodeViews`.
-- **DPI Variances**: Browser scaling and DPI can slightly affect height measurements. The `pageHeight` constant is tuned for standard 96 DPI.
-
-### 3. Future Improvements
-- **Multi-line Paragraph Splitting**: Use line-level measurement to split paragraphs across pages.
-- **Table Handling**: Implement logic to handle page breaks within large tables, ensuring headers repeat correctly.
-- **Section Headers/Footers**: Add dedicated support for dynamic recurring headers and page numbering (e.g., "Page X of Y").
-- **Offline Proofing**: Integration with spellcheckers tailored for legal terminology.
+2. Install dependencies: `npm install`
+3. Run dev server: `npm run dev`
+4. Open [http://localhost:3000](http://localhost:3000)
