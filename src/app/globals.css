@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --page-width: 8.5in;
+  --page-height: 11in;
+  --page-margin: 1in;
+  --bg-color: #f8f9fa;
+  /* Formal light gray/ivory */
+  --shadow-color: rgba(0, 0, 0, 0.15);
+  --primary-legal: #1a2a40;
+  /* Deep navy */
+  --border-formal: #ced4da;
+}
+
+body {
+  background-color: var(--bg-color);
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #212529;
+}
+
+/* Pagination Styles */
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.page-container {
+  width: var(--page-width);
+  min-height: var(--page-height);
+  padding: var(--page-margin);
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e9ecef;
+  margin-bottom: 2rem;
+  position: relative;
+  transition: box-shadow 0.2s ease;
+}
+
+/* Tiptap specific styling - Legal/Formal Focus */
+.ProseMirror {
+  outline: none;
+  min-height: 100%;
+  font-family: 'Playfair Display', serif;
+  /* Formal legal look */
+  font-size: 12pt;
+  /* Standard legal font size equivalent */
+  line-height: 1.6;
+}
+
+.ProseMirror p {
+  margin-bottom: 1.5em;
+  text-align: justify;
+}
+
+.ProseMirror h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1em;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-legal);
+}
+
+.ProseMirror h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.8em;
+  border-bottom: 1px solid var(--border-formal);
+  padding-bottom: 0.2em;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 2rem;
+  margin-bottom: 1.5em;
+}
+
+/* Page Break Decoration - More Formal */
+.page-break-decoration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  pointer-events: none;
+  margin-left: calc(-1 * var(--page-margin));
+  margin-right: calc(-1 * var(--page-margin));
+  height: 80px;
+  background-color: var(--bg-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-break-line {
+  height: 2px;
+  background: repeating-linear-gradient(90deg,
+      var(--border-formal),
+      var(--border-formal) 10px,
+      transparent 10px,
+      transparent 20px);
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 0;
+}
+
+.page-break-label {
+  background: var(--bg-color);
+  padding: 0.25rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  border: 1px solid var(--border-formal);
+  border-radius: 4px;
+  z-index: 2;
+}
+
+/* Print simulation */
+@media print {
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  body {
+    background: white;
+  }
+
+  .editor-container {
+    padding: 0;
+  }
+
+  .page-container {
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    width: 100%;
+    padding: 1in;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
+  .page-break-decoration {
+    display: none;
+  }
+}
