@@ -14,7 +14,7 @@ A professional, Tiptap-based document editor with real-time pagination, specific
 
 ## Live Demo & Repository
 
-- **Live Demo**: [View Live Editor](https://tiptap-pagination-editor.vercel.app) *(Replace with your final Vercel URL)*
+- **Live Demo**: [View Live Editor](https://tiptap-pagination-editor-alpha.vercel.app/)
 - **GitHub Repository**: [adharsh555/tiptap-pagination-editor](https://github.com/adharsh555/tiptap-pagination-editor)
 
 ## Getting Started
@@ -62,14 +62,3 @@ The core pagination logic is implemented as a custom Tiptap extension. It uses t
 - **Table Handling**: Implement logic to handle page breaks within large tables, ensuring headers repeat correctly.
 - **Section Headers/Footers**: Add dedicated support for dynamic recurring headers and page numbering (e.g., "Page X of Y").
 - **Offline Proofing**: Integration with spellcheckers tailored for legal terminology.
-
-## Deployment & Storage
-
-This application is ready for production. It is optimized for deployment to **Vercel**, which provides the best experience for Next.js applications. For persistent storage, we recommend integrating **Supabase** or **Vercel Postgres**.
-
-### Quick Deploy Tip
-1. Push this code to GitHub.
-2. Connect the repo to Vercel.
-3. Your professional legal editor will be live in minutes!
-
-
