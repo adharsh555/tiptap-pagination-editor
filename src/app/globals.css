@@ -5,18 +5,18 @@
   --page-width: 8.5in;
   --page-height: 11in;
   --page-margin: 1in;
-  --bg-color: #f8f9fa;
-  /* Formal light gray/ivory */
-  --shadow-color: rgba(0, 0, 0, 0.15);
+  --workspace-bg: #f0f2f5;
+  --sheet-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   --primary-legal: #1a2a40;
-  /* Deep navy */
-  --border-formal: #ced4da;
+  --border-formal: #dee2e6;
 }
 
 body {
-  background-color: var(--bg-color);
+  background-color: var(--workspace-bg);
   font-family: 'Inter', system-ui, sans-serif;
   color: #212529;
+  margin: 0;
+  padding: 0;
 }
 
 /* Pagination Styles */
@@ -24,101 +24,92 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0;
   min-height: 100vh;
+  padding-top: 1rem;
 }
 
+/* The wrapper that hosts the ProseMirror flow */
 .page-container {
   width: var(--page-width);
-  min-height: var(--page-height);
-  padding: var(--page-margin);
   background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e9ecef;
-  margin-bottom: 2rem;
+  box-shadow: var(--sheet-shadow);
   position: relative;
-  transition: box-shadow 0.2s ease;
+  /* We don't use overflow: hidden here or it breaks page breaks */
 }
 
-/* Tiptap specific styling - Legal/Formal Focus */
+/* Tiptap specific styling - Focused on Page Margins */
 .ProseMirror {
   outline: none;
-  min-height: 100%;
+  min-height: var(--page-height);
+  padding: var(--page-margin);
   font-family: 'Playfair Display', serif;
-  /* Formal legal look */
   font-size: 12pt;
-  /* Standard legal font size equivalent */
-  line-height: 1.6;
+  line-height: 1.5;
+  box-sizing: border-box;
 }
 
 .ProseMirror p {
-  margin-bottom: 1.5em;
+  margin-bottom: 0.8rem;
   text-align: justify;
 }
 
 .ProseMirror h1 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--primary-legal);
 }
 
 .ProseMirror h2 {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 0.8em;
+  margin-bottom: 0.6rem;
   border-bottom: 1px solid var(--border-formal);
-  padding-bottom: 0.2em;
 }
 
-.ProseMirror ul,
-.ProseMirror ol {
-  padding-left: 2rem;
-  margin-bottom: 1.5em;
-}
-
-/* Page Break Decoration - More Formal */
+/* 
+   Page Break Decoration 
+   This is the "Gap" between sheets.
+   It must handle:
+   - Remaining space on previous page
+   - Workspace gap
+   - Top margin of next page
+*/
 .page-break-decoration {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  pointer-events: none;
-  margin-left: calc(-1 * var(--page-margin));
-  margin-right: calc(-1 * var(--page-margin));
-  height: 80px;
-  background-color: var(--bg-color);
   position: relative;
-  overflow: hidden;
+  width: var(--page-width);
+  /* The height is controlled dynamically by JS to fulfill the 11in requirement */
+  margin-left: calc(-1 * var(--page-margin));
+  background-color: var(--workspace-bg);
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
 }
 
 .page-break-line {
-  height: 2px;
-  background: repeating-linear-gradient(90deg,
-      var(--border-formal),
-      var(--border-formal) 10px,
-      transparent 10px,
-      transparent 20px);
   width: 100%;
+  height: 1px;
+  background-color: var(--border-formal);
   position: absolute;
   top: 50%;
-  left: 0;
 }
 
 .page-break-label {
-  background: var(--bg-color);
-  padding: 0.25rem 1rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #6c757d;
+  background: white;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #adb5bd;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 1px;
   border: 1px solid var(--border-formal);
-  border-radius: 4px;
-  z-index: 2;
+  border-radius: 2px;
+  z-index: 5;
 }
 
 /* Print simulation */
@@ -129,26 +120,30 @@ body {
   }
 
   body {
-    background: white;
+    background: white !important;
   }
 
   .editor-container {
-    padding: 0;
+    padding: 0 !important;
   }
 
   .page-container {
-    margin: 0;
-    box-shadow: none;
-    border: none;
-    width: 100%;
-    padding: 1in;
+    box-shadow: none !important;
+    width: 100% !important;
   }
 
-  .toolbar {
-    display: none;
+  .ProseMirror {
+    padding: var(--page-margin) !important;
+  }
+
+  .toolbar,
+  .templates-dropdown {
+    display: none !important;
   }
 
   .page-break-decoration {
-    display: none;
+    page-break-after: always;
+    visibility: hidden;
+    height: 0 !important;
   }
 }

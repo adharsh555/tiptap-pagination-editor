@@ -256,7 +256,9 @@ export default function Editor() {
             StarterKit,
             Underline,
             Pagination.configure({
-                pageHeight: 900,
+                pageHeight: 864, // 9 inches @ 96dpi
+                margin: 96,      // 1 inch @ 96dpi
+                gap: 32          // Workspace gap
             }),
             Placeholder.configure({
                 placeholder: 'Begin your legal drafting here...',
@@ -268,7 +270,7 @@ export default function Editor() {
     `,
         editorProps: {
             attributes: {
-                class: 'focus:outline-none min-h-[11in]',
+                class: 'focus:outline-none',
             },
         },
         immediatelyRender: false,
@@ -300,7 +302,7 @@ export default function Editor() {
     if (!mounted) return null;
 
     return (
-        <div className="editor-container h-screen flex flex-col bg-[#f4f5f7]">
+        <div className="flex flex-col h-screen overflow-hidden">
             <Toolbar
                 editor={editor}
                 onNew={handleNew}
@@ -310,9 +312,11 @@ export default function Editor() {
                 onManualSave={handleManualSave}
                 onSelectTemplate={handleSelectTemplate}
             />
-            <div className="flex-grow w-full overflow-y-auto pt-8 pb-32 flex flex-col items-center">
-                <div className="page-container mb-0 shrink-0">
-                    <EditorContent editor={editor} />
+            <div className="flex-grow overflow-y-auto bg-[#f0f2f5] pt-12 pb-32">
+                <div className="editor-container">
+                    <div className="page-container">
+                        <EditorContent editor={editor} />
+                    </div>
                 </div>
             </div>
         </div>
