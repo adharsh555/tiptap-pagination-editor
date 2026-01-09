@@ -60,7 +60,7 @@ The core pagination logic is implemented as a custom Tiptap extension. It uses t
 
 ## Deployment & Storage
 
-This application is ready for production. For detailed instructions on how to deploy to **Vercel** or **Render**, and how to connect a database (like **Supabase** or **Postgres**), please see our [Deployment Guide](DEPLOYMENT.md).
+This application is ready for production. It is optimized for deployment to **Vercel**, which provides the best experience for Next.js applications. For persistent storage, we recommend integrating **Supabase** or **Vercel Postgres**.
 
 ### Quick Deploy Tip
 1. Push this code to GitHub.
