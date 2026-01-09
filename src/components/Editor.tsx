@@ -31,15 +31,19 @@ const Toolbar = ({
     isAutoSave,
     setIsAutoSave,
     onManualSave,
-    onSelectTemplate
+    onSelectTemplate,
+    docTitle,
+    setDocTitle
 }: {
     editor: TiptapEditor | null,
     onNew: () => void,
     onDelete: () => void,
     isAutoSave: boolean,
     setIsAutoSave: (val: boolean) => void,
-    onManualSave: () => void,
-    onSelectTemplate: (content: string) => void
+    onManualSave: (title: string, content: string) => void,
+    onSelectTemplate: (content: string) => void,
+    docTitle: string,
+    setDocTitle: (val: string) => void
 }) => {
     const [saveStatus, setSaveStatus] = useState("Saved");
     const [showTemplates, setShowTemplates] = useState(false);
@@ -57,8 +61,9 @@ const Toolbar = ({
     }, [editor, isAutoSave]);
 
     const handleManualSaveClick = () => {
+        if (!editor) return;
         setSaveStatus("Saving...");
-        onManualSave();
+        onManualSave(docTitle, editor.getHTML());
         setTimeout(() => setSaveStatus("Saved"), 1000);
     };
 
@@ -75,7 +80,8 @@ const Toolbar = ({
                     <div className="flex items-center gap-2 group">
                         <input
                             type="text"
-                            defaultValue="LegalDraft Pro - Untitled"
+                            value={docTitle}
+                            onChange={(e) => setDocTitle(e.target.value)}
                             className="bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-[#1f1f1f] px-1 rounded -ml-1 w-fit min-w-[100px] hover:border hover:border-gray-300 transition-all font-medium"
                         />
                         <div className="text-[11px] text-gray-400 font-medium lowercase flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -231,11 +237,7 @@ const Toolbar = ({
 export default function Editor() {
     const [mounted, setMounted] = useState(false);
     const [isAutoSave, setIsAutoSave] = useState(true);
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMounted(true);
-    }, []);
+    const [docTitle, setDocTitle] = useState("LegalDraft Pro - Untitled");
 
     const editor = useEditor({
         extensions: [
@@ -262,21 +264,67 @@ export default function Editor() {
         immediatelyRender: false,
     });
 
+    useEffect(() => {
+        setMounted(true);
+        const savedContent = localStorage.getItem('legaldraft_content');
+        const savedTitle = localStorage.getItem('legaldraft_title');
+        const savedAutoSave = localStorage.getItem('legaldraft_autosave');
+
+        if (savedContent && editor) {
+            editor.commands.setContent(savedContent);
+        }
+        if (savedTitle) {
+            setDocTitle(savedTitle);
+        }
+        if (savedAutoSave !== null) {
+            setIsAutoSave(savedAutoSave === 'true');
+        }
+    }, [editor]);
+
+    // Save title to localStorage
+    useEffect(() => {
+        if (mounted) {
+            localStorage.setItem('legaldraft_title', docTitle);
+            localStorage.setItem('legaldraft_autosave', isAutoSave.toString());
+        }
+    }, [docTitle, isAutoSave, mounted]);
+
+    // Auto-save content
+    useEffect(() => {
+        if (!editor || !isAutoSave || !mounted) return;
+
+        const handleUpdate = () => {
+            localStorage.setItem('legaldraft_content', editor.getHTML());
+        };
+
+        editor.on('update', handleUpdate);
+        return () => {
+            editor.off('update', handleUpdate);
+        };
+    }, [editor, isAutoSave, mounted]);
+
     const handleNew = () => {
         if (editor && confirm("Start a new document? Any unsaved changes will be lost.")) {
-            editor.commands.setContent('<h1>New Document</h1><p>Start typing...</p>');
+            const defaultContent = '<h1>New Document</h1><p>Start typing...</p>';
+            const defaultTitle = 'LegalDraft Pro - Untitled';
+            editor.commands.setContent(defaultContent);
+            setDocTitle(defaultTitle);
+            localStorage.setItem('legaldraft_content', defaultContent);
+            localStorage.setItem('legaldraft_title', defaultTitle);
         }
     };
 
     const handleDelete = () => {
         if (editor && confirm("Are you sure you want to clear this document?")) {
             editor.commands.clearContent();
+            localStorage.removeItem('legaldraft_content');
         }
     };
 
-    const handleManualSave = () => {
-        // Logic for manual save (e.g., API call)
-        console.log("Manual save triggered:", editor?.getHTML());
+    const handleManualSave = (title: string, content: string) => {
+        localStorage.setItem('legaldraft_title', title);
+        localStorage.setItem('legaldraft_content', content);
+        console.log("Saved to localStorage:", { title, content });
     };
 
     const handleSelectTemplate = (content: string) => {
@@ -297,6 +345,8 @@ export default function Editor() {
                 setIsAutoSave={setIsAutoSave}
                 onManualSave={handleManualSave}
                 onSelectTemplate={handleSelectTemplate}
+                docTitle={docTitle}
+                setDocTitle={setDocTitle}
             />
             <div className="flex-grow overflow-y-auto bg-[#f0f2f5] pt-12 pb-32">
                 <div className="editor-container">
