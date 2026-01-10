@@ -5,11 +5,13 @@
   --page-width: 8.5in;
   --page-height: 11in;
   --page-margin: 1in;
-  --workspace-bg: #f8f9fa;
+  --workspace-bg: #f0f2f5;
+  /* Matches the Editor component background */
   --docs-blue: #c2e7ff;
   --docs-blue-dark: #004a77;
   --docs-border: #e0e0e0;
-  --sheet-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.1);
+  --sheet-shadow: 0 1px 1px rgba(0, 0, 0, 0.1),
+    0 2px 5px rgba(0, 0, 0, 0.1);
   --primary-legal: #1a2a40;
   --border-formal: #dee2e6;
 }
@@ -78,36 +80,24 @@ body {
 */
 .page-break-decoration {
   position: relative;
-  width: var(--page-width);
-  margin-left: calc(-1 * var(--page-margin));
-  background-color: var(--workspace-bg);
+  width: 100%;
   cursor: default;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   user-select: none;
+  overflow: visible;
+  /* Crucial for wide gaps */
 }
 
 .page-break-line {
   width: 100%;
   height: 1px;
-  background-color: var(--docs-border);
+  background-color: #e8eaed;
+  /* Subtle gray line like in reference image */
   position: absolute;
   top: 50%;
-}
-
-.page-break-label {
-  background: white;
-  padding: 2px 8px;
-  font-size: 10px;
-  font-weight: 700;
-  color: #adb5bd;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border: 1px solid var(--docs-border);
-  border-radius: 2px;
-  z-index: 5;
 }
 
 /* Tooltip/Menu mimicking Google Docs */

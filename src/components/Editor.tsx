@@ -236,6 +236,7 @@ const Toolbar = ({
 
 export default function Editor() {
     const [mounted, setMounted] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false);
     const [isAutoSave, setIsAutoSave] = useState(true);
     const [docTitle, setDocTitle] = useState("LegalDraft Pro - Untitled");
 
@@ -264,13 +265,15 @@ export default function Editor() {
         immediatelyRender: false,
     });
 
+    // Hydration
     useEffect(() => {
-        setMounted(true);
+        if (!editor) return;
+
         const savedContent = localStorage.getItem('legaldraft_content');
         const savedTitle = localStorage.getItem('legaldraft_title');
         const savedAutoSave = localStorage.getItem('legaldraft_autosave');
 
-        if (savedContent && editor) {
+        if (savedContent) {
             editor.commands.setContent(savedContent);
         }
         if (savedTitle) {
@@ -279,19 +282,22 @@ export default function Editor() {
         if (savedAutoSave !== null) {
             setIsAutoSave(savedAutoSave === 'true');
         }
+
+        setMounted(true);
+        setIsHydrated(true);
     }, [editor]);
 
-    // Save title to localStorage
+    // Save title & settings to localStorage
     useEffect(() => {
-        if (mounted) {
+        if (isHydrated && mounted) {
             localStorage.setItem('legaldraft_title', docTitle);
             localStorage.setItem('legaldraft_autosave', isAutoSave.toString());
         }
-    }, [docTitle, isAutoSave, mounted]);
+    }, [docTitle, isAutoSave, isHydrated, mounted]);
 
     // Auto-save content
     useEffect(() => {
-        if (!editor || !isAutoSave || !mounted) return;
+        if (!editor || !isAutoSave || !isHydrated || !mounted) return;
 
         const handleUpdate = () => {
             localStorage.setItem('legaldraft_content', editor.getHTML());
@@ -301,7 +307,7 @@ export default function Editor() {
         return () => {
             editor.off('update', handleUpdate);
         };
-    }, [editor, isAutoSave, mounted]);
+    }, [editor, isAutoSave, isHydrated, mounted]);
 
     const handleNew = () => {
         if (editor && confirm("Start a new document? Any unsaved changes will be lost.")) {
@@ -325,6 +331,7 @@ export default function Editor() {
         localStorage.setItem('legaldraft_title', title);
         localStorage.setItem('legaldraft_content', content);
         console.log("Saved to localStorage:", { title, content });
+        alert("Document saved locally.");
     };
 
     const handleSelectTemplate = (content: string) => {
