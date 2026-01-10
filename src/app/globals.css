@@ -122,28 +122,19 @@ body {
 
   body {
     background: white !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
 
   .editor-container {
-    display: block !important;
-    /* Critical: Flexbox breaks pagination */
     padding: 0 !important;
-    min-height: auto !important;
   }
 
   .page-container {
     box-shadow: none !important;
     width: 100% !important;
-    display: block !important;
-    margin: 0 !important;
-    overflow: visible !important;
   }
 
   .ProseMirror {
     padding: var(--page-margin) !important;
-    min-height: auto !important;
   }
 
   .toolbar,
@@ -152,24 +143,9 @@ body {
     display: none !important;
   }
 
-  /* 
-     This widget is the physical break point. 
-     We hide it visually but forcing the break.
-  */
   .page-break-decoration {
-    display: block !important;
-    height: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    /* Force the break */
-    break-after: page !important;
-    page-break-after: always !important;
+    page-break-after: always;
     visibility: hidden;
-  }
-
-  /* Hide the tail/head/gap children specifically */
-  .page-break-decoration>* {
-    display: none !important;
+    height: 0 !important;
   }
 }
