@@ -2,7 +2,7 @@
 *Submission for OpenSphere Full-Stack Intern Assignment*
 
 ## Overview
-LegalDraft Pro is a specialized Tiptap-based editor designed for the immigration law workflow. It solves the "content measurement" challenge by implementing real-time pagination with exact US Letter (8.5" x 11") parity, ensuring that what the user drafts is exactly what will be printed for USCIS submissions.
+LegalDraft Pro is a specialized Tiptap-based editor designed for the immigration law workflow. It implements a **Sequential Flow Layout Engine** that provides real-time pagination with exact US Letter (8.5" x 11") parity. This ensures that what the user drafts—critical for USCIS submissions—is exactly what will be printed, with zero data loss or visual clipping.
 
 ## Live Demo & Repository
 - **Live Demo**: [https://tiptap-pagination-editor-alpha.vercel.app/](https://tiptap-pagination-editor-alpha.vercel.app/)
@@ -10,37 +10,43 @@ LegalDraft Pro is a specialized Tiptap-based editor designed for the immigration
 
 ---
 
-## Technical Approach: How Pagination Works
+## Technical Architecture: Sequential Flow Layout
 
-### 1. The Measurement Engine
-Pagination in rich text is difficult because DOM nodes don't have a fixed "page" concept. My approach uses a custom **Tiptap Extension** that taps into the `view.update` hook:
-- **Node-Level Measurement**: The extension iterates through the editor's rendered DOM content.
-- **DPI-Aware Calculation**: It calculates the cumulative height of block nodes (paragraphs, headings, lists) against a baseline of **1056px** (11 inches at 96 DPI).
-- **Slack-Based Decorations**: When the content exceeds the Drawable Height (9 inches of content + 2 inches of margins), it calculates the "slack" (empty space left on the page).
+LegalDraft Pro moves beyond simple line-count estimation. It implements a true document layout engine.
 
-### 2. High-Fidelity Page Breaks
-Unlike simple dividers, LegalDraft Pro uses a **Widget Decoration** strategy:
-- It inserts a dynamic-height decoration that accounts for: **[Slack] + [Bottom Margin] + [Workspace Gap] + [Top Margin]**.
-- This ensures that the distance from the top of Page 1 to the top of Page 2 is **exactly 1088px** (11 inches + 32px workspace gap), matching the vertical rhythm of Google Docs.
+### 1. Sequential Measurement Engine
+The editor processes the document as a continuous sequence of block nodes (paragraphs, headings, lists). 
+- **DOM-Reflective Height**: It uses `getBoundingClientRect()` and `getComputedStyle()` to capture the real visual height of content, including variable line heights, margins, and complex formatting.
+- **Visual Stride**: Content is tracked against a **1056px** (11") vertical cycle.
 
-### 3. Print Parity
-I used **CSS Paged Media** rules (`@media print`) and strict `box-sizing: border-box` styling to ensure that the 1-inch margins in the editor translate perfectly to the binary PDF output.
+### 2. Line-Aware Backtracking (Zero-Clipping Split)
+Unlike basic editors that might "slice" a line of text horizontally across two pages, LegalDraft Pro features **Line-Aware Backtracking**:
+- **Binary Search Detection**: The engine identifies the exact character that initiates an overflow.
+- **Rhythmic Backtrack**: It then scans backward to find the start of that line.
+- **Atomic Page Move**: The engine moves the *entire line* to the next page, ensuring that characters are never horizontally sliced and that the visual transition is seamless.
 
----
+### 3. High-Fidelity Geometry
+- **Page Stride**: Each page change results in exactly **1096px** of vertical distance (1056px page + 40px workspace gap).
+- **Dynamic Spacers**: The distance is maintained via a dynamic `widget decoration` that bridges the gap between the last fitting line on Page N and the top of Page N+1.
 
-## Trade-offs and Limitations
-
-- **Block-Level Splitting**: Currently, page breaks occur *between* Tiptap nodes. If a single paragraph is longer than 11 inches, it will not be split mid-paragraph in this version. 
-- **Performance**: Recalculating heights on every change is efficient for 5-10 page documents, but for a 100-page petition, this would transition to an Intersection Observer or "Windowing" approach to maintain 60fps.
-- **DPI Reliance**: The 96dpi assumption is standard for most browsers but can vary with OS-level scaling. Future iterations would use a hidden "ruler" element to calibrate DPI dynamically.
+### 4. Print & PDF Parity
+The editor achieves 1:1 print parity using strictly controlled CSS variables and `@media print` rules. The 1-inch margins in the editor are mapped directly to physical margins in the PDF output.
 
 ---
 
-## Improvements with More Time
-1. **Paragraph/Row Splitting**: Implementing a logic to split multi-line paragraphs across pages using `line-height` math.
-2. **Table Pagination**: Handling page breaks inside table rows (repeating headers).
-3. **Dynamic Headers/Footers**: Allowing users to double-click the top/bottom margins to edit recurring document headers.
-4. **Offline Persistence**: Using IndexDB/Supabase for robust local-first drafting.
+## Fulfilled Project Scope
+
+As per the project requirements:
+- [x] **Visual Page Breaks**: Clear, dynamic separation between US Letter pages.
+- [x] **Match Print Output**: Strict 8.5" x 11" geometry with 1" margins for USCIS standards.
+- [x] **Standard Formatting**: Full support for Headings, Lists, and Rich Text.
+- [x] **Graceful Edge Cases**: 
+    - Paragraphs spanning pages are split cleanly between lines.
+    - Content reflows instantly during typing or pasting.
+- [x] **Enhancements**:
+    - **Templates**: Pre-built structures for legal drafting.
+    - **Print/PDF**: Clean 1:1 export functionality.
+    - **Auto-Save**: Local persistence for document safety.
 
 ---
 
