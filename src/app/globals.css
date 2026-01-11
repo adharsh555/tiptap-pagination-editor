@@ -24,33 +24,98 @@ body {
   padding: 0;
 }
 
-/* Pagination Styles */
+/* PAGE CLIPPING ARCHITECTURE */
+
+/* The main relative container */
 .editor-container {
+  background: var(--workspace-bg);
+  min-height: 100vh;
+  /* Vertical spacing for visual comfort */
+  padding: 48px 0;
+  overflow-x: hidden;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  width: 100%;
 }
 
-/* The wrapper that hosts the ProseMirror flow */
-.page-container {
-  width: var(--page-width);
-  background: white;
-  box-shadow: var(--sheet-shadow);
+/* 
+   The Stack Wrapper 
+   This holds the editor and applies the clipping mask 
+*/
+.page-stack {
   position: relative;
-  transition: box-shadow 0.2s ease;
-  /* We don't use overflow: hidden here or it breaks page breaks */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  /* Sit above the background layer */
+
+  /* CRITICAL: The mask that clips content between pages */
+  /* Page (1056px) + Gap (40px) = 1096px Stride */
+  /* We want content visible for 1056px, then transparent for 40px. */
+  /* Actually, to match the visual stack: 
+     Page 1 ends at 1056px. Gap is 1056-1096. 
+     So Black 0-1056, Transparent 1056-1096. 
+  */
+  mask-image: repeating-linear-gradient(to bottom,
+      black 0,
+      black calc(var(--page-height) + 1px),
+      transparent calc(var(--page-height) + 1px),
+      transparent calc(var(--page-height) + 40px));
+  -webkit-mask-image: repeating-linear-gradient(to bottom,
+      black 0,
+      black calc(var(--page-height) + 1px),
+      transparent calc(var(--page-height) + 1px),
+      transparent calc(var(--page-height) + 40px));
 }
 
-/* Tiptap specific styling - Focused on Page Margins */
+/* Background Layer: Holds the visual "Masks" (Page Borders) */
+.page-mask-layer {
+  position: absolute;
+  top: 48px;
+  /* Matches editor-container padding */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Individual Visual Page Container */
+.page-mask {
+  width: var(--page-width);
+  height: var(--page-height);
+  background: white;
+  border: 1px solid #dadce0;
+  box-shadow: var(--sheet-shadow);
+  margin-bottom: 40px;
+  /* Gap between sheets */
+  flex-shrink: 0;
+}
+
+/* Tiptap specific styling */
 .ProseMirror {
   outline: none;
-  min-height: var(--page-height);
-  padding: var(--page-margin);
+  max-width: var(--page-width);
+  width: var(--page-width);
+  /* Exact 1 inch margins */
+  padding: 1in;
+  margin: 0 auto;
+
   font-family: 'Playfair Display', serif;
   font-size: 12pt;
   line-height: 1.5;
   box-sizing: border-box;
+
+  min-height: auto;
+  background: transparent;
+  /* Show masks behind */
 }
 
 .ProseMirror p {
@@ -76,28 +141,15 @@ body {
 
 /* 
    Page Break Decoration 
-   This is the "Gap" between sheets.
+   Just a spacer now, relying on mask for visuals.
 */
 .page-break-decoration {
-  position: relative;
   width: 100%;
-  cursor: default;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  user-select: none;
-  overflow: visible;
-  /* Crucial for wide gaps */
-}
-
-.page-break-line {
-  width: 100%;
-  height: 1px;
-  background-color: #e8eaed;
-  /* Subtle gray line like in reference image */
-  position: absolute;
-  top: 50%;
+  height: 40px;
+  /* Match the Mask Gap */
+  background: transparent;
+  pointer-events: none;
+  display: block;
 }
 
 /* Tooltip/Menu mimicking Google Docs */
@@ -117,35 +169,64 @@ body {
 @media print {
   @page {
     size: letter;
-    margin: 0;
+    margin: 1in;
+    /* Let browser handle margins on EVERY page */
   }
 
-  body {
+  /* Nuclear Reset: Force all containers to allow flow */
+  html,
+  body,
+  #__next,
+  main {
     background: white !important;
+    height: auto !important;
+    width: 100% !important;
+    overflow: visible !important;
+    display: block !important;
+    margin: 0 !important;
   }
 
   .editor-container {
+    display: block !important;
     padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
   .page-container {
     box-shadow: none !important;
     width: 100% !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
   }
 
   .ProseMirror {
-    padding: var(--page-margin) !important;
+    padding: 0 !important;
+    /* Remove container padding since @page handles it */
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
+  /* Hide UI elements */
   .toolbar,
   .templates-dropdown,
   .header-top {
     display: none !important;
   }
 
+  /* Force the page break */
   .page-break-decoration {
-    page-break-after: always;
-    visibility: hidden;
+    display: block !important;
+    /* Must be block to trigger break */
+    page-break-after: always !important;
+    break-after: page !important;
+    visibility: hidden !important;
     height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }

@@ -245,9 +245,10 @@ export default function Editor() {
             StarterKit,
             Underline,
             Pagination.configure({
-                pageHeight: 864, // 9 inches @ 96dpi
-                margin: 96,      // 1 inch @ 96dpi
-                gap: 32          // Workspace gap
+                usablePageHeight: 864,
+                totalPageHeight: 1056,
+                margin: 96,
+                gap: 40
             }),
             Placeholder.configure({
                 placeholder: 'Begin your legal drafting here...',
@@ -294,20 +295,6 @@ export default function Editor() {
             localStorage.setItem('legaldraft_autosave', isAutoSave.toString());
         }
     }, [docTitle, isAutoSave, isHydrated, mounted]);
-
-    // Auto-save content
-    useEffect(() => {
-        if (!editor || !isAutoSave || !isHydrated || !mounted) return;
-
-        const handleUpdate = () => {
-            localStorage.setItem('legaldraft_content', editor.getHTML());
-        };
-
-        editor.on('update', handleUpdate);
-        return () => {
-            editor.off('update', handleUpdate);
-        };
-    }, [editor, isAutoSave, isHydrated, mounted]);
 
     const handleNew = () => {
         if (editor && confirm("Start a new document? Any unsaved changes will be lost.")) {
@@ -357,7 +344,11 @@ export default function Editor() {
             />
             <div className="flex-grow overflow-y-auto bg-[#f0f2f5] pt-12 pb-32">
                 <div className="editor-container">
-                    <div className="page-container">
+                    {/* Background Layer: Holds the visual masks (borders) */}
+                    <div id="page-mask-layer" className="page-mask-layer" />
+
+                    {/* Stack Layer: clipped by CSS mask */}
+                    <div className="page-stack">
                         <EditorContent editor={editor} />
                     </div>
                 </div>
