@@ -1,56 +1,50 @@
 # LegalDraft Pro: Tiptap Pagination Editor
 *Submission for OpenSphere Full-Stack Intern Assignment*
 
-## Overview
-LegalDraft Pro is a specialized Tiptap-based editor designed for the immigration law workflow. It implements a **Sequential Flow Layout Engine** that provides real-time pagination with exact US Letter (8.5" x 11") parity. This ensures that what the user drafts—critical for USCIS submissions—is exactly what will be printed, with zero data loss or visual clipping.
-
-## Live Demo & Repository
+## 🚀 Deliverables
 - **Live Demo**: [https://tiptap-pagination-editor-alpha.vercel.app/](https://tiptap-pagination-editor-alpha.vercel.app/)
 - **GitHub Repository**: [adharsh555/tiptap-pagination-editor](https://github.com/adharsh555/tiptap-pagination-editor)
 
+## 📋 Overview
+LegalDraft Pro is a specialized Tiptap-based editor designed for the immigration law workflow. It implements a **Sequential Flow Layout Engine** that provides real-time pagination with exact US Letter (8.5" x 11") parity. This ensures that what the user drafts—critical for USCIS submissions—is exactly what will be printed.
+
 ---
 
-## Technical Architecture: Sequential Flow Layout
+## 🧠 Technical Approach: How Pagination Works
 
-LegalDraft Pro moves beyond simple line-count estimation. It implements a true document layout engine.
+Calculating page breaks in a web-based rich text editor is non-trivial because the DOM is naturally a "lone scroll." My approach simulates a true word-processor layout engine.
 
 ### 1. Sequential Measurement Engine
-The editor processes the document as a continuous sequence of block nodes (paragraphs, headings, lists). 
-- **DOM-Reflective Height**: It uses `getBoundingClientRect()` and `getComputedStyle()` to capture the real visual height of content, including variable line heights, margins, and complex formatting.
-- **Visual Stride**: Content is tracked against a **1056px** (11") vertical cycle.
+The editor processes the document as a continuous sequence of block nodes.
+- **Visual Height Accumulation**: It uses `getBoundingClientRect()` and `getComputedStyle()` to capture the real visual height of every paragraph and heading, including variable line-heights and margins.
+- **Usable Content Tracking**: Content is measured against a **1056px** (11") vertical stride, with a **864px** (9") content area limit to respect the 1-inch top/bottom margins.
 
-### 2. Line-Aware Backtracking (Zero-Clipping Split)
-Unlike basic editors that might "slice" a line of text horizontally across two pages, LegalDraft Pro features **Line-Aware Backtracking**:
-- **Binary Search Detection**: The engine identifies the exact character that initiates an overflow.
-- **Rhythmic Backtrack**: It then scans backward to find the start of that line.
-- **Atomic Page Move**: The engine moves the *entire line* to the next page, ensuring that characters are never horizontally sliced and that the visual transition is seamless.
-
-### 3. High-Fidelity Geometry
-- **Page Stride**: Each page change results in exactly **1096px** of vertical distance (1056px page + 40px workspace gap).
-- **Dynamic Spacers**: The distance is maintained via a dynamic `widget decoration` that bridges the gap between the last fitting line on Page N and the top of Page N+1.
-
-### 4. Print & PDF Parity
-The editor achieves 1:1 print parity using strictly controlled CSS variables and `@media print` rules. The 1-inch margins in the editor are mapped directly to physical margins in the PDF output.
+### 2. Line-Aware Backtracking (The "Surgical Split")
+To prevent the "horizontal clipping" (where a line is cut in half horizontally), I implemented a backtracking logic:
+- **Detection**: The engine identifies the exact character that initiates an overflow.
+- **Backtrack**: It then scans backward until it finds the start of that specific line (detecting the point where the `y-coordinate` changes).
+- **Atomic Move**: The entire line is moved to the next page using a dynamic **Widget Decoration**, ensuring characters are never sliced and the visual transition is seamless.
 
 ---
 
-## Fulfilled Project Scope
+## ⚖️ Trade-offs and Limitations
 
-As per the project requirements:
-- [x] **Visual Page Breaks**: Clear, dynamic separation between US Letter pages.
-- [x] **Match Print Output**: Strict 8.5" x 11" geometry with 1" margins for USCIS standards.
-- [x] **Standard Formatting**: Full support for Headings, Lists, and Rich Text.
-- [x] **Graceful Edge Cases**: 
-    - Paragraphs spanning pages are split cleanly between lines.
-    - Content reflows instantly during typing or pasting.
-- [x] **Enhancements**:
-    - **Templates**: Pre-built structures for legal drafting.
-    - **Print/PDF**: Clean 1:1 export functionality.
-    - **Auto-Save**: Local persistence for document safety.
+1. **Measurement Overhead**: Recalculating the height of all blocks on every update is highly accurate but computationally expensive for very long documents (50+ pages). In a production environment, I would move to an **Intersection Observer** or **Windowing** approach to only calculate visible pages.
+2. **Fixed 96 DPI**: The engine assumes a standard 96 DPI for pixel-to-inch conversion. While standard for web browsers, OS-level scaling can occasionally cause sub-pixel desync.
+3. **Atomic Blocks**: Certain complex blocks like tables are currently treated as atomic. If a table row is larger than a page, it requires more complex nested row-splitting logic.
 
 ---
 
-## Getting Started
+## 🚀 Future Improvements
+
+1. **Dynamic Headers/Footers**: Adding support for recurring text at the top and bottom of every page.
+2. **Page Numbering**: Automated `Page X of Y` rendering in the footer area.
+3. **Table Row Splitting**: Implementing logic to split table rows across pages while repeating header rows.
+4. **Performance Optimization**: Moving the layout calculation to a Web Worker to keep the main thread 100% responsive during massive content reflows.
+
+---
+
+## 🛠️ Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
